@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edge.js Templating Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="./app/src/edge.js"></script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      // test the router functionality
+      Route.get("login", edge.render("auth.login", { title: "Login" }));
+      Route.get("signup", edge.render("auth.signup", { title: "Signup" }));
+      
+    </script>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+@extends('layouts.auth')
+@section('content')
+    <form id="loginForm" class="space-y-4">
+        <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+            <input type="email" id="email" name="email" required
+                class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Enter your email">
+        </div>
+
+        <div>
+            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="password" name="password" required
+                class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Enter your password">
+        </div>
+
+        <div>
+            <button type="submit"
+                class="w-full bg-indigo-600 text-white font-medium py-2 rounded-md hover:bg-indigo-700 transition">
+                Login
+            </button>
+        </div>
+
+        <div class="text-center">
+            <a href="?page=forgot-password" class="text-sm text-indigo-600 hover:underline">Forgot your password?</a>
+        </div>
+    </form>
+@endsection
+
+@section('scripts')
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Login functionality would be implemented here!');
+        });
+    </script>
+@endsection

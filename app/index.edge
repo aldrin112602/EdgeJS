@@ -1,0 +1,45 @@
+@extends('layouts.main')
+
+@section('title', 'Welcome to My App')
+
+@section('content')
+<div class="card">
+    <h1>Welcome to Edge.js Templating!</h1>
+    <p>This is a Laravel Blade-inspired templating system for JavaScript.</p>
+    
+    @if(user)
+        <p>Hello, {{ user.name }}! Welcome back.</p>
+    @else
+        <p>Please <a href="?page=login">login</a> to continue.</p>
+    @endif
+    
+    <h2>Features:</h2>
+    <ul>
+        <li>Template inheritance with @extends</li>
+        <li>Sections with @section and @yield</li>
+        <li>Variables with {{ variable }} syntax</li>
+        <li>Conditionals with @if, @else, @endif</li>
+        <li>Loops with @foreach</li>
+        <li>Automatic route handling</li>
+    </ul>
+    
+    @if(items)
+        <h3>Items:</h3>
+        <ul>
+        @foreach(items as item)
+            <li>{{ item.name }} - {{ item.description }}</li>
+        @endforeach
+        </ul>
+    @endif
+</div>
+
+<div class="card">
+    <h2>Navigation</h2>
+    <p>Try navigating to different pages:</p>
+    <ul>
+        <li><a href="?page=index">Home</a></li>
+        <li><a href="?page=login">Login Page</a></li>
+        <li><a href="?page=about">About Page</a></li>
+    </ul>
+</div>
+@endsection
