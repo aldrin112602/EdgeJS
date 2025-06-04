@@ -5,15 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Edge.js Templating Demo</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="./app/src/edge.js"></script>
+    <script src="./app/src/edge.min.js"></script>
   </head>
   <body>
     <div id="app"></div>
+    <script src="./app/routes.js"></script>
     <script>
-      // test the router functionality
-      Route.get("login", edge.render("auth.login", { title: "Login" }));
-      Route.get("signup", edge.render("auth.signup", { title: "Signup" }));
-      
+        // WARNING: DON'T EDIT THIS CODE BELOW UNLESS YOU KNOW WHAT YOU ARE DOING
+      const dispatchRoute = () => {
+        const page = router.getCurrentPage();
+        const renderFunc = routes[page];
+
+        if (renderFunc) Route.get(page, renderFunc);
+        else Route.get(page, routes["404"]);
+      };
+
+      window.addEventListener("DOMContentLoaded", dispatchRoute);
+      window.addEventListener("popstate", dispatchRoute);
     </script>
   </body>
 </html>

@@ -1,45 +1,53 @@
-@extends('layouts.main')
-
-@section('title', 'Welcome to My App')
+@extends('layouts.landing-page')
 
 @section('content')
-<div class="card">
-    <h1>Welcome to Edge.js Templating!</h1>
-    <p>This is a Laravel Blade-inspired templating system for JavaScript.</p>
-    
-    @if(user)
-        <p>Hello, {{ user.name }}! Welcome back.</p>
-    @else
-        <p>Please <a href="?page=login">login</a> to continue.</p>
-    @endif
-    
-    <h2>Features:</h2>
-    <ul>
-        <li>Template inheritance with @extends</li>
-        <li>Sections with @section and @yield</li>
-        <li>Variables with {{ variable }} syntax</li>
-        <li>Conditionals with @if, @else, @endif</li>
-        <li>Loops with @foreach</li>
-        <li>Automatic route handling</li>
-    </ul>
-    
-    @if(items)
-        <h3>Items:</h3>
-        <ul>
-        @foreach(items as item)
-            <li>{{ item.name }} - {{ item.description }}</li>
-        @endforeach
-        </ul>
-    @endif
-</div>
 
-<div class="card">
-    <h2>Navigation</h2>
-    <p>Try navigating to different pages:</p>
-    <ul>
-        <li><a href="?page=index">Home</a></li>
-        <li><a href="?page=login">Login Page</a></li>
-        <li><a href="?page=about">About Page</a></li>
-    </ul>
-</div>
+  {{-- Hero Section --}}
+  <section class="flex flex-col items-center justify-center text-center py-24 px-6 bg-gradient-to-b from-blue-100 via-white to-white">
+    <h1 class="text-5xl font-extrabold mb-4 text-gray-900 leading-tight tracking-tight">
+      Welcome to <span class="text-blue-600">Edge.js</span>
+    </h1>
+    <p class="text-lg text-gray-700 max-w-2xl mb-10">
+      A lightweight JavaScript templating engine inspired by Laravel Blade — bring server-side layout and sectioning to the browser.
+    </p>
+    <div class="flex space-x-4">
+      <a href="?page=signup" class="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium shadow hover:bg-blue-700 transition-all duration-200">
+        Get Started
+      </a>
+      <a href="?page=login" class="px-6 py-3 bg-white border border-gray-300 text-gray-800 rounded-xl font-medium shadow hover:bg-gray-100 transition-all duration-200">
+        Login
+      </a>
+    </div>
+  </section>
+
+  {{-- Features Section --}}
+  <section class="py-20 px-6 bg-white">
+    <h2 class="text-3xl font-bold text-center text-gray-900 mb-16">Why Use Edge.js?</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
+      <div class="p-6 border rounded-2xl shadow-sm hover:shadow-md transition-all">
+        <div class="text-blue-600 mb-3 text-3xl">🧩</div>
+        <h3 class="text-xl font-semibold mb-2">Blade-Like Syntax</h3>
+        <p class="text-gray-600">Use <code>@yield</code>, <code>@section</code>, and <code>@extends</code> just like in Laravel Blade.</p>
+      </div>
+      <div class="p-6 border rounded-2xl shadow-sm hover:shadow-md transition-all">
+        <div class="text-green-600 mb-3 text-3xl">⚡</div>
+        <h3 class="text-xl font-semibold mb-2">Client-Side Routing</h3>
+        <p class="text-gray-600">Change views using <code>?page=...</code> without full-page reloads. Minimal setup required.</p>
+      </div>
+      <div class="p-6 border rounded-2xl shadow-sm hover:shadow-md transition-all">
+        <div class="text-purple-600 mb-3 text-3xl">🎯</div>
+        <h3 class="text-xl font-semibold mb-2">Modular & Lightweight</h3>
+        <p class="text-gray-600">Pure JavaScript, zero dependencies. Easily extend or integrate into any front-end workflow.</p>
+      </div>
+    </div>
+  </section>
+
+  {{-- Footer --}}
+  <footer class="mt-auto py-8 bg-gray-100 text-center text-gray-600 border-t">
+    <p class="text-sm">
+      Created with ❤️ for the JS and Laravel community. View the project on 
+      <a href="https://github.com/aldrin112602/EdgeJS" target="_blank" class="text-blue-600 hover:underline">GitHub</a>.
+    </p>
+  </footer>
+
 @endsection

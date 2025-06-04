@@ -1,6 +1,9 @@
 "use strict";
 
-const $ = (selector) => document.querySelector(selector);
+const selector = (selector) => document.querySelector(selector);
+function removeComments(template) {
+  return template.replace(/\{\{--.*?--\}\}/gs, '');
+}
 
 function extractSections(template) {
   const sectionRegex = /@section\(['"](.+?)['"]\)([\s\S]*?)@endsection/g;
@@ -9,10 +12,7 @@ function extractSections(template) {
 
   while ((match = sectionRegex.exec(template)) !== null) {
     const sectionName = match[1];
-
-    console.log("Section name:", sectionName);
     const sectionContent = match[2].trim();
-    console.log("Section content:", sectionContent);
     sections[sectionName] = sectionContent;
   }
 
@@ -259,15 +259,10 @@ const Route = {
         finalHtml = applyLayout(layoutTemplate, sections);
       }
 
-      console.log(finalHtml)
-      document.getElementById("app").innerHTML = finalHtml;
+      selector("#app").innerHTML = removeComments(finalHtml);
     })
     .catch((error) => {
       console.error(`Error rendering view: ${url}`, error);
     });
 }
 };
-
-
-console.log("Edge.js loaded");
-console.log("Current page:", router.getCurrentPage());
