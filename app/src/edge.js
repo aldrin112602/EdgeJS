@@ -2,8 +2,30 @@
 
 const selector = (selector) => document.querySelector(selector);
 function removeComments(template) {
-  return template.replace(/\{\{--.*?--\}\}/gs, '');
+  return template.replace(/\{\{--.*?--\}\}/gs, "");
 }
+
+
+function injectScriptSections(sections) {
+  const scriptSectionKeys = ["js", "scripts", "script", "javascript"];
+
+  scriptSectionKeys.forEach((key) => {
+    if (sections[key]) {
+      const temp = document.createElement("div");
+      temp.innerHTML = sections[key];
+      const scripts = temp.querySelectorAll("script");
+
+      scripts.forEach((s) => {
+        const script = document.createElement("script");
+        script.type = "text/javascript";
+        if (s.src) script.src = s.src;
+        else script.textContent = s.textContent;
+        document.body.appendChild(script);
+      });
+    }
+  });
+}
+
 
 function extractSections(template) {
   const sectionRegex = /@section\(['"](.+?)['"]\)([\s\S]*?)@endsection/g;
@@ -13,6 +35,23 @@ function extractSections(template) {
   while ((match = sectionRegex.exec(template)) !== null) {
     const sectionName = match[1];
     const sectionContent = match[2].trim();
+    // if (
+    //   sectionContent.startsWith("<script>") &&
+    //   sectionContent.endsWith("</script>")
+    // ) {
+    //   const temp = document.createElement("div");
+    //   temp.innerHTML = sectionContent;
+    //   const scripts = temp.querySelectorAll("script");
+
+    //   scripts.forEach((s) => {
+    //     const script = document.createElement("script");
+    //     script.type = "text/javascript";
+    //     if (s.src) script.src = s.src;
+    //     else script.textContent = s.textContent;
+    //     document.body.appendChild(script);
+    //   });
+    //   continue;
+    // }
     sections[sectionName] = sectionContent;
   }
 
@@ -20,12 +59,18 @@ function extractSections(template) {
 }
 
 function applyLayout(layout, sections) {
-  return layout.replace(/@yield\(['"](.+?)['"](?:,\s*['"](.+?)['"])?\)/g, (match, name, fallback) => {
-    return sections[name] || fallback || '';
-  });
+  console.log("Applying layout with sections:", sections);
+  if (!layout) {
+    console.error("No layout provided.");
+    return "";
+  }
+  return layout.replace(
+    /@yield\(['"](.+?)['"](?:,\s*['"](.+?)['"])?\)/g,
+    (match, name, fallback) => {
+      return sections[name] || fallback || "";
+    }
+  );
 }
-
-
 
 const getUrlParams = () => {
   const params = new URLSearchParams(window.location.search);
@@ -211,7 +256,6 @@ const router = {
   },
 };
 
-
 const edge = {
   render: async function (
     view,
@@ -242,27 +286,25 @@ const edge = {
   },
 };
 
-
-
 const Route = {
   get: function (url, fnc) {
-  fnc
-    .then(async (viewContent) => {
-      const layoutMatch = viewContent.match(/@extends\(['"](.+?)['"]\)/);
-      const layoutView = layoutMatch ? layoutMatch[1].replace(/\./g, '/') : null;
-      const sections = extractSections(viewContent);
-
-      let finalHtml = viewContent;
-
-      if (layoutView) {
-        const layoutTemplate = await edge.render(layoutView);
-        finalHtml = applyLayout(layoutTemplate, sections);
-      }
-
-      selector("#app").innerHTML = removeComments(finalHtml);
-    })
-    .catch((error) => {
-      console.error(`Error rendering view: ${url}`, error);
-    });
-}
+    fnc
+      .then(async (viewContent) => {
+        const layoutMatch = viewContent.match(/@extends\(['"](.+?)['"]\)/);
+        const layoutView = layoutMatch
+          ? layoutMatch[1].replace(/\./g, "/")
+          : null;
+        const sections = extractSections(viewContent);
+        let finalHtml = viewContent;
+        if (layoutView) {
+          const layoutTemplate = await edge.render(layoutView);
+          finalHtml = applyLayout(layoutTemplate, sections);
+        }
+        selector("#app").innerHTML = removeComments(finalHtml);
+        injectScriptSections(sections);
+      })
+      .catch((error) => {
+        console.error(`Error rendering view: ${url}`, error);
+      });
+  },
 };
