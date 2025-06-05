@@ -5,7 +5,6 @@ function removeComments(template) {
   return template.replace(/\{\{--.*?--\}\}/gs, "");
 }
 
-
 function injectScriptSections(sections) {
   const scriptSectionKeys = ["js", "scripts", "script", "javascript"];
 
@@ -26,7 +25,6 @@ function injectScriptSections(sections) {
   });
 }
 
-
 function extractSections(template) {
   const sectionRegex = /@section\(['"](.+?)['"]\)([\s\S]*?)@endsection/g;
   const sections = {};
@@ -35,23 +33,6 @@ function extractSections(template) {
   while ((match = sectionRegex.exec(template)) !== null) {
     const sectionName = match[1];
     const sectionContent = match[2].trim();
-    // if (
-    //   sectionContent.startsWith("<script>") &&
-    //   sectionContent.endsWith("</script>")
-    // ) {
-    //   const temp = document.createElement("div");
-    //   temp.innerHTML = sectionContent;
-    //   const scripts = temp.querySelectorAll("script");
-
-    //   scripts.forEach((s) => {
-    //     const script = document.createElement("script");
-    //     script.type = "text/javascript";
-    //     if (s.src) script.src = s.src;
-    //     else script.textContent = s.textContent;
-    //     document.body.appendChild(script);
-    //   });
-    //   continue;
-    // }
     sections[sectionName] = sectionContent;
   }
 
@@ -66,7 +47,7 @@ function applyLayout(layout, sections) {
   }
   return layout.replace(
     /@yield\(['"](.+?)['"](?:,\s*['"](.+?)['"])?\)/g,
-    (match, name, fallback) => {
+    (_, name, fallback) => {
       return sections[name] || fallback || "";
     }
   );
