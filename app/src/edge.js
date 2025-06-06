@@ -1,308 +1,174 @@
-"use strict";
+((w, d) => {
+  "use strict";
 
-const selector = (selector) => document.querySelector(selector);
-function removeComments(template) {
-  return template.replace(/\{\{--.*?--\}\}/g, "");
-}
+  w.selector = (selector) => d.querySelector(selector);
+  const removeComments = (template) => template.replace(/\{\{--.*?--\}\}/g, "");
+  const injectScriptSections = (sections) => {
+    const scriptSectionKeys = ["js", "scripts", "script", "javascript"];
 
-function injectScriptSections(sections) {
-  const scriptSectionKeys = ["js", "scripts", "script", "javascript"];
+    scriptSectionKeys.forEach((key) => {
+      if (sections[key]) {
+        const temp = d.createElement("div");
+        temp.innerHTML = sections[key];
+        const scripts = temp.querySelectorAll("script");
 
-  scriptSectionKeys.forEach((key) => {
-    if (sections[key]) {
-      const temp = document.createElement("div");
-      temp.innerHTML = sections[key];
-      const scripts = temp.querySelectorAll("script");
-
-      scripts.forEach((s) => {
-        const script = document.createElement("script");
-        script.type = "text/javascript";
-        if (s.src) script.src = s.src;
-        else script.textContent = s.textContent;
-        document.body.appendChild(script);
-      });
-    }
-  });
-}
-
-function extractSections(template) {
-  const sections = {};
-
-  const inlineSectionRegex =
-    /@section\(\s*['"](.+?)['"]\s*,\s*['"]([\s\S]*?)['"]\s*\)/g;
-  const blockSectionRegex =
-    /@section\(\s*['"](.+?)['"]\s*\)([\s\S]*?)@endsection/g;
-
-  template = template.replace(inlineSectionRegex, (match, name, content) => {
-    sections[name] = content.trim();
-    return "";
-  });
-
-  let match;
-  while ((match = blockSectionRegex.exec(template)) !== null) {
-    const sectionName = match[1];
-    const sectionContent = match[2].trim();
-    if (!sections[sectionName]) {
-      sections[sectionName] = sectionContent;
-    }
-  }
-
-  return sections;
-}
-
-function applyLayout(layout, sections) {
-  if (!layout) {
-    console.error("No layout provided.");
-    return "";
-  }
-
-  return layout.replace(
-    /@yield\(\s*['"](.+?)['"]\s*(?:,\s*['"]([\s\S]*?)['"])?\s*\)/g,
-    (_, name, fallback) => {
-      return sections[name] !== undefined ? sections[name] : (fallback || "");
-    }
-  );
-}
-
-
-const getUrlParams = () => {
-  const params = new URLSearchParams(window.location.search);
-  return {
-    page: params.get("page") || "index",
-  };
-};
-
-const router = {
-  currentPage: getUrlParams().page,
-  setPage: function (page) {
-    if (page) {
-      this.currentPage = page;
-    } else {
-      this.currentPage = "index";
-    }
-  },
-  getPage: function () {
-    return this.currentPage;
-  },
-  getUrlParams: function () {
-    return getUrlParams();
-  },
-  getUrlParam: function (name) {
-    const params = getUrlParams();
-    return params[name] || null;
-  },
-  getUrl: function () {
-    const params = getUrlParams();
-    return `?page=${params.page}`;
-  },
-  getFullUrl: function () {
-    return window.location.origin + this.getUrl();
-  },
-  getFullUrlWithParam: function (name, value) {
-    const params = getUrlParams();
-    params[name] = value;
-    return `${window.location.origin}?${new URLSearchParams(
-      params
-    ).toString()}`;
-  },
-  getFullUrlWithoutParam: function (name) {
-    const params = getUrlParams();
-    params.delete(name);
-    return `${window.location.origin}?${new URLSearchParams(
-      params
-    ).toString()}`;
-  },
-  getFullUrlWithParams: function (params) {
-    const currentParams = getUrlParams();
-    Object.keys(params).forEach((key) => {
-      currentParams[key] = params[key];
-    });
-    return `${window.location.origin}?${new URLSearchParams(
-      currentParams
-    ).toString()}`;
-  },
-  getFullUrlWithoutParams: function (paramNames) {
-    const params = getUrlParams();
-    paramNames.forEach((name) => {
-      params.delete(name);
-    });
-    return `${window.location.origin}?${new URLSearchParams(
-      params
-    ).toString()}`;
-  },
-  getCurrentUrl: function () {
-    return window.location.href;
-  },
-  getCurrentPath: function () {
-    return window.location.pathname;
-  },
-  getCurrentHash: function () {
-    return window.location.hash;
-  },
-  getCurrentSearch: function () {
-    return window.location.search;
-  },
-  getCurrentOrigin: function () {
-    return window.location.origin;
-  },
-  getCurrentProtocol: function () {
-    return window.location.protocol;
-  },
-  getCurrentHost: function () {
-    return window.location.host;
-  },
-  getCurrentPort: function () {
-    return window.location.port;
-  },
-  getCurrentHostname: function () {
-    return window.location.hostname;
-  },
-  getCurrentHref: function () {
-    return window.location.href;
-  },
-  getCurrentUrlParams: function () {
-    return getUrlParams();
-  },
-  getCurrentUrlParam: function (name) {
-    const params = getUrlParams();
-    return params[name] || null;
-  },
-  getCurrentUrlWithParam: function (name, value) {
-    const params = getUrlParams();
-    params[name] = value;
-    return `${window.location.origin}?${new URLSearchParams(
-      params
-    ).toString()}`;
-  },
-  getCurrentUrlWithoutParam: function (name) {
-    const params = getUrlParams();
-    params.delete(name);
-    return `${window.location.origin}?${new URLSearchParams(
-      params
-    ).toString()}`;
-  },
-  getCurrentUrlWithParams: function (params) {
-    const currentParams = getUrlParams();
-    Object.keys(params).forEach((key) => {
-      currentParams[key] = params[key];
-    });
-    return `${window.location.origin}?${new URLSearchParams(
-      currentParams
-    ).toString()}`;
-  },
-  getCurrentUrlWithoutParams: function (paramNames) {
-    const params = getUrlParams();
-    paramNames.forEach((name) => {
-      params.delete(name);
-    });
-    return `${window.location.origin}?${new URLSearchParams(
-      params
-    ).toString()}`;
-  },
-  navigateTo: function (page) {
-    this.setPage(page);
-    window.history.pushState({}, "", this.getUrl());
-    window.dispatchEvent(new Event("popstate"));
-  },
-  reload: function () {
-    window.location.reload();
-  },
-  back: function () {
-    window.history.back();
-  },
-  forward: function () {
-    window.history.forward();
-  },
-  replaceState: function (state, title, url) {
-    window.history.replaceState(state, title, url);
-  },
-  pushState: function (state, title, url) {
-    window.history.pushState(state, title, url);
-  },
-  onPopState: function (callback) {
-    window.addEventListener("popstate", callback);
-  },
-  offPopState: function (callback) {
-    window.removeEventListener("popstate", callback);
-  },
-  onHashChange: function (callback) {
-    window.addEventListener("hashchange", callback);
-  },
-  offHashChange: function (callback) {
-    window.removeEventListener("hashchange", callback);
-  },
-  onUrlChange: function (callback) {
-    window.addEventListener("popstate", callback);
-    window.addEventListener("hashchange", callback);
-  },
-  offUrlChange: function (callback) {
-    window.removeEventListener("popstate", callback);
-    window.removeEventListener("hashchange", callback);
-  },
-  getCurrentPage: function () {
-    return this.getPage();
-  },
-  setCurrentPage: function (page) {
-    this.setPage(page);
-    window.history.pushState({}, "", this.getUrl());
-    window.dispatchEvent(new Event("popstate"));
-  },
-};
-
-const edge = {
-  render: async function (
-    view,
-    options = {
-      method: "GET",
-      headers: {
-        "Content-Type": "text/html",
-      },
-    }
-  ) {
-    const viewPath = view.replace(/\./g, "/");
-    const data = await this.fetchContent(`app/${viewPath}.edge`, options);
-
-    return removeComments(data);
-  },
-
-  fetchContent: async function (url, options = {}) {
-    try {
-      const response = await fetch(url, options);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        scripts.forEach((s) => {
+          const script = d.createElement("script");
+          script.type = "text/javascript";
+          if (s.src) script.src = s.src;
+          else script.textContent = s.textContent;
+          d.body.appendChild(script);
+        });
       }
-      return await response.text();
-    } catch (error) {
-      console.error("Fetch error:", error);
-      throw error;
+    });
+  };
+
+  const extractSections = (template) => {
+    const sections = {};
+
+    const inlineSectionRegex =
+      /@section\(\s*['"](.+?)['"]\s*,\s*['"]([\s\S]*?)['"]\s*\)/g;
+    const blockSectionRegex =
+      /@section\(\s*['"](.+?)['"]\s*\)([\s\S]*?)@endsection/g;
+
+    template = template.replace(inlineSectionRegex, (match, name, content) => {
+      sections[name] = content.trim();
+      return "";
+    });
+
+    let match;
+    while ((match = blockSectionRegex.exec(template)) !== null) {
+      const sectionName = match[1];
+      const sectionContent = match[2].trim();
+      if (!sections[sectionName]) {
+        sections[sectionName] = sectionContent;
+      }
     }
-  },
-};
 
-const Route = {
-  get: function (url, fnc) {
-    fnc
-      .then(async (viewContent) => {
-        const layoutMatch = viewContent.match(/@extends\(['"](.+?)['"]\)/);
-        const layoutView = layoutMatch
-          ? layoutMatch[1].replace(/\./g, "/")
-          : null;
-        const sections = extractSections(viewContent);
-        let finalHtml = viewContent;
-        if (layoutView) {
-          const layoutTemplate = await edge.render(layoutView);
-          finalHtml = applyLayout(layoutTemplate, sections);
+    return sections;
+  };
+
+  const applyLayout = (layout, sections) => {
+    if (!layout) {
+      console.error("No layout provided.");
+      return "";
+    }
+
+    return layout.replace(
+      /@yield\(\s*['"](.+?)['"]\s*(?:,\s*['"]([\s\S]*?)['"])?\s*\)/g,
+      (_, name, fallback) => {
+        return sections[name] !== undefined ? sections[name] : fallback || "";
+      }
+    );
+  };
+
+  const getUrlParams = () => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      page: params.get("page") || "index",
+    };
+  };
+
+  w.router = {
+    currentPage: getUrlParams().page,
+    
+    setPage: function (page) {
+      this.currentPage = page || "index";
+    },
+    
+    getPage: function () {
+      return this.currentPage;
+    },
+    
+    getUrlParam: function (name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    },
+    
+    navigateTo: function (page) {
+      this.setPage(page);
+      const url = `?page=${this.currentPage}`;
+      window.history.pushState({}, "", url);
+      window.dispatchEvent(new Event("popstate"));
+    },
+    
+    back: function () {
+      window.history.back();
+    },
+    
+    forward: function () {
+      window.history.forward();
+    },
+    
+    onPopState: function (callback) {
+      window.addEventListener("popstate", callback);
+    },
+    
+    offPopState: function (callback) {
+      window.removeEventListener("popstate", callback);
+    }
+  };
+
+  w.edge = {
+    render: async function (
+      view,
+      options = {
+        method: "GET",
+        headers: {
+          "Content-Type": "text/html",
+        },
+      }
+    ) {
+      const viewPath = view.replace(/\./g, "/");
+      const data = await this.fetchContent(`app/${viewPath}.edge`, options);
+
+      return removeComments(data);
+    },
+
+    fetchContent: async function (url, options = {}) {
+      try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+        return await response.text();
+      } catch (error) {
+        console.error("Fetch error:", error);
+        throw error;
+      }
+    },
+  };
 
-        selector("#app").innerHTML = finalHtml;
-        injectScriptSections(sections);
-      })
-      .catch((error) => {
-        console.error(`Error rendering view: ${url}`, error);
-      });
-  },
-};
+  w.Route = {
+    get: (url, fnc) => {
+      fnc
+        .then(async (viewContent) => {
+          const layoutMatch = viewContent.match(/@extends\(['"](.+?)['"]\)/);
+          const layoutView = layoutMatch
+            ? layoutMatch[1].replace(/\./g, "/")
+            : null;
+          const sections = extractSections(viewContent);
+          let finalHtml = viewContent;
+          if (layoutView) {
+            const layoutTemplate = await edge.render(layoutView);
+            finalHtml = applyLayout(layoutTemplate, sections);
+          }
 
-document.addEventListener('DOMContentLoaded', () => {
-  console.info('You are now using EdgeJS in the browser version 1.0.0')
-})
+          selector("#app").innerHTML = finalHtml;
+          injectScriptSections(sections);
+        })
+        .catch((error) => {
+          console.error(`Error rendering view: ${url}`, error);
+        });
+    },
+  };
+
+  d.addEventListener("DOMContentLoaded", () => {
+    console.info(
+      "%c⚡ EdgeJS v1.0.0%c Because why should PHP devs have all the fun?\n%cNow serving Blade-like templates in pure JS!",
+      "background: #1E3A8A; color: #FACC15; font-size: 18px; padding: 6px 10px; border-radius: 4px; font-weight: bold;",
+      "background: #1E3A8A; color: #FACC15; font-size: 16px; padding: 4px 6px; border-radius: 4px;",
+      "background: #047857; color: #FFFFFF; font-size: 14px; padding: 3px 8px; border-radius: 4px;"
+    );
+  });
+})(window, document);
