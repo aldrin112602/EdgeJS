@@ -71,42 +71,42 @@
 
   w.router = {
     currentPage: getUrlParams().page,
-    
+
     setPage: function (page) {
       this.currentPage = page || "index";
     },
-    
+
     getPage: function () {
       return this.currentPage;
     },
-    
+
     getUrlParam: function (name) {
       const params = new URLSearchParams(window.location.search);
       return params.get(name);
     },
-    
+
     navigateTo: function (page) {
       this.setPage(page);
       const url = `?page=${this.currentPage}`;
       window.history.pushState({}, "", url);
       window.dispatchEvent(new Event("popstate"));
     },
-    
+
     back: function () {
       window.history.back();
     },
-    
+
     forward: function () {
       window.history.forward();
     },
-    
+
     onPopState: function (callback) {
       window.addEventListener("popstate", callback);
     },
-    
+
     offPopState: function (callback) {
       window.removeEventListener("popstate", callback);
-    }
+    },
   };
 
   w.edge = {
