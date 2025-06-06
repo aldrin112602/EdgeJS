@@ -26,24 +26,34 @@ function injectScriptSections(sections) {
 }
 
 function extractSections(template) {
-  const sectionRegex = /@section\(['"](.+?)['"]\)([\s\S]*?)@endsection/g;
   const sections = {};
-  let match;
 
-  while ((match = sectionRegex.exec(template)) !== null) {
+  const inlineSectionRegex =
+    /@section\(\s*['"](.+?)['"]\s*,\s*['"]([\s\S]*?)['"]\s*\)/g;
+  const blockSectionRegex =
+    /@section\(\s*['"](.+?)['"]\s*\)([\s\S]*?)@endsection/g;
+
+  template = template.replace(inlineSectionRegex, (match, name, content) => {
+    sections[name] = content.trim();
+    return "";
+  });
+
+  let match;
+  while ((match = blockSectionRegex.exec(template)) !== null) {
     const sectionName = match[1];
     const sectionContent = match[2].trim();
-    sections[sectionName] = sectionContent;
+    if (!sections[sectionName]) {
+      sections[sectionName] = sectionContent;
+    }
   }
 
   return sections;
 }
 
 function applyLayout(layout, sections) {
-  console.log("Applying layout with sections:", sections);
   if (!layout) {
     console.error("No layout provided.");
-    return "";
+    return;
   }
   return layout.replace(
     /@yield\(['"](.+?)['"](?:,\s*['"](.+?)['"])?\)/g,
