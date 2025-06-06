@@ -2,7 +2,7 @@
 
 const selector = (selector) => document.querySelector(selector);
 function removeComments(template) {
-  return template.replace(/\{\{--.*?--\}\}/gs, "");
+  return template.replace(/\{\{--.*?--\}\}/g, "");
 }
 
 function injectScriptSections(sections) {
@@ -53,15 +53,17 @@ function extractSections(template) {
 function applyLayout(layout, sections) {
   if (!layout) {
     console.error("No layout provided.");
-    return;
+    return "";
   }
+
   return layout.replace(
-    /@yield\(['"](.+?)['"](?:,\s*['"](.+?)['"])?\)/g,
+    /@yield\(\s*['"](.+?)['"]\s*(?:,\s*['"]([\s\S]*?)['"])?\s*\)/g,
     (_, name, fallback) => {
-      return sections[name] || fallback || "";
+      return sections[name] !== undefined ? sections[name] : (fallback || "");
     }
   );
 }
+
 
 const getUrlParams = () => {
   const params = new URLSearchParams(window.location.search);
@@ -260,7 +262,7 @@ const edge = {
     const viewPath = view.replace(/\./g, "/");
     const data = await this.fetchContent(`app/${viewPath}.edge`, options);
 
-    return data;
+    return removeComments(data);
   },
 
   fetchContent: async function (url, options = {}) {
@@ -291,7 +293,8 @@ const Route = {
           const layoutTemplate = await edge.render(layoutView);
           finalHtml = applyLayout(layoutTemplate, sections);
         }
-        selector("#app").innerHTML = removeComments(finalHtml);
+
+        selector("#app").innerHTML = finalHtml;
         injectScriptSections(sections);
       })
       .catch((error) => {
@@ -299,3 +302,7 @@ const Route = {
       });
   },
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+  console.info('You are now using EdgeJS in the browser version 1.0.0')
+})
