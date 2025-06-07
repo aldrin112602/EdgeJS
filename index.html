@@ -17,22 +17,34 @@
   <body>
     <div id="app"></div>
     <script src="./app/routes.js"></script>
+
+    <!-- Your Custom Script -->
     <script>
-      // WARNING: DON'T EDIT THIS CODE BELOW UNLESS YOU KNOW WHAT YOU ARE DOING
-      (() => {
+      alert(
+        "Edge.js Templating Demo is running in a Single Page Application(SPA) like magic!"
+      );
+    </script>
+    <!-- Your Custom Script -->
+
+    <script>
+      
+      //  * WARNING: 
+      //  * DON'T EDIT THIS CODE BELOW UNLESS YOU KNOW WHAT YOU ARE DOING
+      //  * This code is responsible for routing and rendering pages
+      //  * in the Edge.js Templating Demo (SPA).
+       
+      ((w) => {
         const dispatchRoute = () => {
           const page = router.currentPage;
-
-          console.log(page)
-          const renderFunc = routes[page];
-
+          const renderFunc = routes[page] && page !== "404"
+              ? routes[page]()
+              : null;
           if (renderFunc) Route.get(page, renderFunc);
-          else Route.get(page, routes["404"]);
+          else Route.get(page, routes["404"]());
         };
-
-        window.addEventListener("DOMContentLoaded", dispatchRoute);
-        window.addEventListener("popstate", dispatchRoute);
-      })();
+        w.addEventListener("DOMContentLoaded", dispatchRoute);
+        w.addEventListener("popstate", dispatchRoute);
+      })(window);
     </script>
   </body>
 </html>

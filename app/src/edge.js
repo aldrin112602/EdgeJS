@@ -112,15 +112,12 @@
   w.edge = {
     render: async function (
       view,
-      options = {
-        method: "GET",
-        headers: {
-          "Content-Type": "text/html",
-        },
-      }
+      callback = null,
     ) {
       const viewPath = view.replace(/\./g, "/");
-      const data = await this.fetchContent(`app/${viewPath}.edge`, options);
+      const data = await this.fetchContent(`app/${viewPath}.edge`, {});
+
+      if (callback && typeof callback === "function") callback();
 
       return removeComments(data);
     },

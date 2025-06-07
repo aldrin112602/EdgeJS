@@ -5,7 +5,7 @@ A lightweight JavaScript library that brings the power of **Laravel Blade-style 
 
 ## ✨ Features
 
-* ✅ Supports `@extends('layouts.master')`, `@section('content')`, and `@yield('content')`
+* ✅ Supports `@extends('layouts.master')`, `@section('content')`, and `@yield('content')` or `@yield('title', 'Default Value')` and `@section('title', 'Login form')`
 * ✅ Client-side HTML rendering without server-side compilation
 * ✅ Simple, readable syntax for maintainable UI components
 * ✅ Ideal for SPA or static site architectures
